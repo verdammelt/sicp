@@ -27,7 +27,17 @@
 
 (define (simpson f a b n)
   (define (h) (/ (- b a) n))
-  (define (y k) (* (* 2 (expt 2 (remainder k 2)))
-		   (f (+ a (* k (h))))))
+  (define (y k) 
+    (* (cond ((odd? k) 4)
+	     ((or (= k 0) (= k n)) 1)
+	     (else 2))
+       (f (+ a (* k (h))))))
   (* (+ (y 0) (sum y 1 inc n))
      (/ (h) 3.0)))
+
+(newline)
+(format #t "integral with dx = 0.01 => ~A~%" (integral cube 0 1 0.01))
+(format #t "simpson with n = 100 => ~A~%" (simpson cube 0 1 100))
+(format #t "integral with dx = 0.001 => ~A~%" (integral cube 0 1 0.001))
+(format #t "simpson with n = 1000 => ~A~%" (simpson cube 0 1 1000))
+
