@@ -14,20 +14,21 @@
 ;; tan x = x / (1 - (x^2 / (3 - x^2 / 5 - (x^2...
 ;; (where x is in radians)
 ;; using cont-frac define (tan-cf x k) (k = number of terns to compute)
+;; 
+;; mjs: so n(i) = (* x x)
+;; mjs: d(i) = -1, -3, -5, -7... (e.g. -1(2n-1))
 (define (tan-cf x k)
-  (define (n i) (* x x))
-  (define (d i)
-    (* -1 (- (* 2 i) 1)))
-  (* (/ 1.0 x)
-     (cont-frac n d k)))
+  (define (n i) (if (= i 1) x (* -1.0 x x)))
+  (define (d i) (- (* 2 i) 1))
+  (cont-frac n d k))
 
 (define pi 3.14159)
-(define (to-radians deg) (* deg (/ pi 180.0)))
 
 (newline)
 (map (lambda (d)
-       (format #t "(tan-cf ~A)=>~A~%" d (tan-cf (to-radians d) 100))
-       (format #t "(tan ~A)=>~A~%" d (tan (to-radians d)))
+       (let ((rad (/ (* d pi) 4))) 
+	 (format #t "(tan-cf ~Api)=>~A~%" (/ d 4) (tan-cf rad 1000))
+	 (format #t "(tan ~Api)=>~A~%" (/ d 4) (tan rad)))
        (newline))
-     '(30 45 60 90 180 270 360))
+     '(0 1 2 3 4))
 
