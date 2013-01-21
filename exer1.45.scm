@@ -47,14 +47,16 @@
 ;;  (expt 2 8))
 
 (define (nth-root n x)
-  (define (number-of-dampenings n)
-    (truncate (/ (log n) (log 2))))
+  (define (log2 x)
+    (/ (log x) (log 2)))
   (define (repeated-dampening n)
-    (repeated average-damp (number-of-dampenings n)))
-  (define (f x) (lambda (y) (/ x (expt y (- n 1)))))
-  (define (nth-root-proc n)
-    (lambda (x) (fixed-point ((repeated-dampening n) (f x)) 1.0)))
+    (repeated average-damp (floor (log2 n))))
 
-  ((nth-root-proc n) x))
+  (fixed-point 
+   ((repeated-dampening n) 
+    (lambda (y) (/ x (expt y (- n 1))))) 
+   1.0))
+
+(nth-root 32 (expt 2 32))
   
 
