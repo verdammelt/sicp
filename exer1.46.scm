@@ -29,11 +29,11 @@
 ;;   (try first-guess))
 
 (define (iterative-improve good-enough? improve)
-  (lambda (guess)
-  	       (if (good-enough? guess)
+  (define (improve-iter guess)
+    (if (good-enough? guess)
   		   guess
-  		   ((iterative-improve good-enough? improve) 
-  		    (improve guess)))))
+  		   (improve-iter (improve guess))))
+  improve-iter)
 
 (define (sqrt x)
   ((iterative-improve 
