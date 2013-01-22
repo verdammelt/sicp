@@ -25,3 +25,9 @@
 (define (equal-rat? x y)
   (= (* (numer x) (denom y))
      (* (numer y) (denom x))))
+
+(define (print-rat x)
+  (newline)
+  (display (numer x))
+  (display "/")
+  (display (denom x)))
