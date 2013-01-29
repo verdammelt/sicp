@@ -18,6 +18,19 @@
 (define (percent i)
   (* 100.0 (/ (width i) (center i))))
 
-
+;; exer 2.13 
+;; assuming small percentages then a simple formula for
+;; approximate percentage tolerance of the product of two intervals
+;; can be expressed in terms of the tolerances of the factors. Assume
+;; all numbers are positive.
+;
+; if x and y are intervals with small percentages then the upper and
+; lower bounds of those numbers are very close to their centers cx and
+; cy. The product of those numbers would be an interval whose lower
+; bound would be (* xlo ylo) and upper bound (* xhi yhi). But with
+; very small percentages that would be approximatley (* cx cy) in both
+; cases. 
+;; the percentage of the product would be approximately (* px py)
+;; WRONG. (+ px py) :(
 
 
