@@ -13,10 +13,11 @@
 ;; percentage.
 ;; (define this)
 (define (make-center-percent c p)
-  (make-interval (- c (* c p)) (+ c (* c p))))
+  (make-center-width c (* c (/ p 100.0))))
 
 (define (percent i)
-  (abs (/ (- (center i) (lower-bound i)) (center i))))
+  (* 100.0 (/ (width i) (center i))))
+
 
 
 
