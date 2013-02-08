@@ -14,6 +14,12 @@
 (define (plus n m) 
   (lambda (f) (lambda (x) ((n f) ((m f) x)))))
 
+;; (pred (lambda (f) (lambda (x) (f x))))  --->  (lambda (f) (lambda (x) x))
+;; (pred (lambda (f) (lambda (x) (f (f x)))))  --->  (lambda (f) (lambda (x) (f x)))
+
+(define (pred n)
+  (lambda (f) (n zero)))
+
 ;; x^y
 (define (exponent n m)
   (m n))
