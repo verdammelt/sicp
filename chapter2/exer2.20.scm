@@ -6,12 +6,29 @@
 (define (same-parity first . rest)
   (define (same-parity-intern nums)
     (cond ((null? nums) (list))
-	  ((and (even? first) (even? (car nums))) 
-	   (append (list (car nums)) (same-parity-intern (cdr nums))))
-	  ((and (odd? first) (odd? (car nums)))
+	  ((= (remainder first 2)
+	      (remainder (car nums) 2))
 	   (append (list (car nums)) (same-parity-intern (cdr nums))))
 	  (else
 	   (same-parity-intern (cdr nums)))))
   (append (list first) (same-parity-intern rest)))
+
+;; from Bill the Lizard
+(define (same-parity2 first . rest)
+  (define (iter nums answer)
+    (if (null? nums) answer
+	(iter (cdr nums)
+	      (if (= (remainder first 2)
+		     (remainder (car nums) 2))
+		  (append answer (list (car nums)))
+		  answer))))
+  (iter rest (list first)))
+
+(newline)
+(display (same-parity 1 2 3 4 5 6))
+(newline)
+(display (same-parity 2 1 3 4 5 6))
+
+
 
 
