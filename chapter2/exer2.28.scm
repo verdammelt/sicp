@@ -4,8 +4,7 @@
 
 (define (fringe l)
   (cond ((null? l) l)
-	((not (pair? (car l))) 
-	 (append (list (car l)) (fringe (cdr l))))
+	((not (pair? l)) (list l))
 	(else (append (fringe (car l)) (fringe (cdr l))))))
 
 
