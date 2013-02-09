@@ -6,5 +6,13 @@
   
   (rev l '()))
 
-(reverse '(1 2 3 4))
+(define (reverse-with-append l)
+  (if (null? l) l
+      (append (reverse-with-append (cdr l))
+	      (list (car l)))))
+
+(newline)
+(display (reverse '(1 2 3 4)))
+(newline)
+(display (reverse-with-append '(1 2 3 4)))
 
