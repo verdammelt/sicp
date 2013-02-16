@@ -72,3 +72,10 @@
 (format #t "balanced? test-balanced-mobile2 (true) => ~A~%" (balanced? test-balanced-mobile2))
 
 
+;; 2.29b - what if make-mobile and make-branch changed to use cons
+;; instead of list.  what would need to change
+;;
+;; i would need to change my definitions of right-branch and
+;; branch-strucutre to be simply cdr.  this is because of the
+;; differences between listing items together and consing them
+;; together.
