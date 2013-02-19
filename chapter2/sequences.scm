@@ -1,5 +1,5 @@
 (define (filter predicate sequence)
-  (cond ((null? sequence) nil)
+  (cond ((null? sequence) (list))
 	((predicate (car sequence))
 	 (cons (car sequence)
 	       (filter predicate (cdr sequence))))
@@ -12,7 +12,7 @@
 	  (accumulate op initial (cdr sequence)))))
 
 (define (enumerate-tree tree)
-  (cond ((null? tree) nil)
+  (cond ((null? tree) (list))
 	((not (pair? tree)) (list tree))
 	(else (append (enumerate-tree (car tree))
 		      (enumerate-tree (cdr tree))))))
