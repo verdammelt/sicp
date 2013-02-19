@@ -8,12 +8,9 @@
 ;;       (cons (accumulate op init <???>)
 ;; 	    (accumualte-n op init <???>))))
 (define (accumulate-n op init seqs)
-  (define (map-seqs fn seqs) 
-    (accumulate (lambda (x y) (cons (fn x) y)) nil seqs))
-
   (if (null? (car seqs)) nil
-      (cons (accumulate op init (map-seqs car seqs))
-	    (accumulate-n op init (map-seqs cdr seqs)))))
+      (cons (accumulate op init (map car seqs))
+	    (accumulate-n op init (map cdr seqs)))))
 
 (define test-seqs (list (list 1 2 3) 
 			(list 4 5 6)
