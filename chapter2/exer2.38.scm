@@ -32,4 +32,4 @@
 ;; fold-left to have the same result for a given sequence.
 ;;
 ;; the op would have be such that order did not matter - such as + or *
-;; (associative?)
+;; (associative?) - wrong :( -- commutative
