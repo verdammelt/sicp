@@ -13,7 +13,8 @@
 (define (count-leaves t)
   (accumulate (lambda (x y) (1+ y)) 
 	      0 
-	      (map <??> <??>)
+	      (enumerate-tree t)
+	      ;; (map <??> <??>) - not sure what to do here.
 	      ))
 
 (define test-tree '(1 (2 3) (4 (5) (6 7))))
