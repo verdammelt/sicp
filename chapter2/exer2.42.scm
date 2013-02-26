@@ -50,22 +50,20 @@
   (define (adjoin-position new-row new-col positions)
     (cons (make-pos new-row new-col) positions))
 
-  (define (safe? col positions)
-    (let ((kth (car positions))
+  (define (safe? kth-col positions)
+    (let ((kth-row (pos-row (car positions)))
 	  (rest (cdr positions)))
-      (and (null? ;; there must be no position w/ same row as kth row
-	    (filter (lambda (pos) (= (pos-row kth) (pos-row pos)))
-		    rest))
-	   (null? ;; there must be no pos w/ row diag up/dn from kth row
-	    (filter (lambda (pos)
-		      (let ((test-col (pos-col pos))
-			    (test-row (pos-row pos)))
-			(let ((col-diff (- col test-col)))
-			  (let ((diag-up (- (pos-row kth) col-diff))
-				(diag-dn (+ (pos-row kth) col-diff)))
-			    (or (= test-row diag-up)
-				(= test-row diag-dn))))))
-		    rest)))))
+      (let ((diag-up (lambda (col) (- kth-row (- kth-col col))))
+	    (diag-dn (lambda (col) (+ kth-row (- kth-col col)))))
+	(null? 
+	 (filter (lambda (pos)
+		   (let ((row (pos-row pos))
+			 (col (pos-col pos)))
+		     (or (= row kth-row)
+			 (= row (diag-up col))
+			 (= row (diag-dn col))
+		       )))
+		 rest)))))
 
   (define (queen-cols k)
     (if (= k 0) (list empty-board)
@@ -77,7 +75,6 @@
 		   (adjoin-position new-row k rest-of-queens))
 		 (enumerate-interval 1 board-size)))
 	  (queen-cols (- k 1))))))
-
 
   (queen-cols board-size))
 
