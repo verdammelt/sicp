@@ -37,16 +37,35 @@
 ;; columns of the board.
 ;;
 (load "sequences.scm")
+(load-option 'format)
+
 (define (queens board-size)
-  (define empty-board ) ;; probably should be nil
+
+  (define empty-board nil)
+
+  (define (make-pos row col) (list row col))
+  (define (pos-row pos) (car pos))
+  (define (pos-col pos) (cadr pos))
 
   (define (adjoin-position new-row new-col positions)
-    )					;append (list new-row
-					;new-col) ? 
+    (cons (make-pos new-row new-col) positions))
 
-  (define (safe? col positions)		;tricky - don't know yet.
-    
-    )
+  (define (safe? col positions)
+    (let ((kth (car positions))
+	  (rest (cdr positions)))
+      (and (null? ;; there must be no position w/ same row as kth row
+	    (filter (lambda (pos) (= (pos-row kth) (pos-row pos)))
+		    rest))
+	   (null? ;; there must be no pos w/ row diag up/dn from kth row
+	    (filter (lambda (pos)
+		      (let ((test-col (pos-col pos))
+			    (test-row (pos-row pos)))
+			(let ((col-diff (- col test-col)))
+			  (let ((diag-up (- (pos-row kth) col-diff))
+				(diag-dn (+ (pos-row kth) col-diff)))
+			    (or (= test-row diag-up)
+				(= test-row diag-dn))))))
+		    rest)))))
 
   (define (queen-cols k)
     (if (= k 0) (list empty-board)
@@ -59,7 +78,19 @@
 		 (enumerate-interval 1 board-size)))
 	  (queen-cols (- k 1))))))
 
+
   (queen-cols board-size))
+
+(define (print-queens-solutions solutions)
+  (map (lambda (solution)
+	 (map (lambda (position)
+		(format #t "Row: ~A Col: ~A~%" 
+			(car position) 
+			(cadr position)))
+	      solution)
+	 (newline))
+       solutions)
+  #t)
 
 ;; In this procedure rest-of-queens is a way to place k - 1 queens in
 ;; the first k - 1 columns, and newrow is a proposed row in which to

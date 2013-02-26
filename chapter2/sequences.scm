@@ -1,6 +1,5 @@
 (define nil (list))
 
-
 (define (filter predicate sequence)
   (cond ((null? sequence) nil)
 	((predicate (car sequence))
