@@ -39,36 +39,31 @@
 (load "sequences.scm")
 (load-option 'format)
 
+(define (make-pos row col) (cons row col))
+(define (pos-row pos) (car pos))
+(define (pos-col pos) (cdr pos))
+
 (define (queens board-size)
 
   (define empty-board nil)
 
-  (define (make-pos row col) (list row col))
-  (define (pos-row pos) (car pos))
-  (define (pos-col pos) (cadr pos))
-
   (define (adjoin-position new-row new-col positions)
     (cons (make-pos new-row new-col) positions))
 
-  (define (safe? kth-col positions)
-    (let ((kth-row (pos-row (car positions)))
+  (define (safe? positions)
+    (define (attacks? p1 p2)
+      (or (= (pos-row p1) (pos-row p2))
+	  (= (abs (- (pos-row p1) (pos-row p2)))
+	     (abs (- (pos-col p1) (pos-col p2))))))
+
+    (let ((kth (car positions))
 	  (rest (cdr positions)))
-      (let ((diag-up (lambda (col) (- kth-row (- kth-col col))))
-	    (diag-dn (lambda (col) (+ kth-row (- kth-col col)))))
-	(null? 
-	 (filter (lambda (pos)
-		   (let ((row (pos-row pos))
-			 (col (pos-col pos)))
-		     (or (= row kth-row)
-			 (= row (diag-up col))
-			 (= row (diag-dn col))
-		       )))
-		 rest)))))
+      (null? (filter (lambda (pos) (attacks? pos kth)) rest))))
 
   (define (queen-cols k)
     (if (= k 0) (list empty-board)
 	(filter
-	 (lambda (positions) (safe? k positions))
+	 (lambda (positions) (safe? positions))
 	 (flatmap
 	  (lambda (rest-of-queens)
 	    (map (lambda (new-row)
@@ -82,8 +77,8 @@
   (map (lambda (solution)
 	 (map (lambda (position)
 		(format #t "Row: ~A Col: ~A~%" 
-			(car position) 
-			(cadr position)))
+			(pos-row position) 
+			(pos-col position)))
 	      solution)
 	 (newline))
        solutions)
