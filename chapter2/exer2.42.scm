@@ -50,7 +50,7 @@
   (define (adjoin-position new-row new-col positions)
     (cons (make-pos new-row new-col) positions))
 
-  (define (safe? positions)
+  (define (valid? positions)
     (define (attacks? p1 p2)
       (or (= (pos-row p1) (pos-row p2))
 	  (= (abs (- (pos-row p1) (pos-row p2)))
@@ -63,7 +63,7 @@
   (define (queen-cols k)
     (if (= k 0) (list empty-board)
 	(filter
-	 (lambda (positions) (safe? positions))
+	 (lambda (positions) (valid? positions))
 	 (flatmap
 	  (lambda (rest-of-queens)
 	    (map (lambda (new-row)
