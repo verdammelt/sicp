@@ -34,7 +34,10 @@
 	((and (number? a1) (number? a2) (+ a1 a2)))
 	(else (list '+ a1 a2))))
 (define addend cadr)
-(define augend caddr)
+(define (augend exp) 
+  (if (null? (cdddr expr))
+      (caddr expr)
+      (cons '+ (cddr expr))))
 
 (define (product? x)
   (and (pair? x) (eq? (car x) '*)))
@@ -45,7 +48,10 @@
 	((and (number? m1) (number? m2)) (* m1 m2))
 	(else (list '* m1 m2))))
 (define multiplier cadr)
-(define multiplicand caddr)
+(define (multiplicand exp) 
+  (if (null? (cdddr exp))
+      (caddr exp)
+      (cons '* (cddr exp))))
 
 (define (exponentiation? exp)
   (and (pair? exp) (eq? (car exp) '**)))
