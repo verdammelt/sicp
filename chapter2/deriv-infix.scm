@@ -1,3 +1,4 @@
+;; exercise 2.58
 (define (deriv exp var)
   (cond ((number? exp) 0)
 	((variable? exp)
