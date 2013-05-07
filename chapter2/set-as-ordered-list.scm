@@ -24,7 +24,7 @@
 	((= x (car set)) set)
 	((< x (car set)) (cons x set))
 	(else (cons (car set) (adjoin-set x (cdr set))))))
-;; (does the job but might as well just use original adjoin-st definition!)
+
 
 ;; exercise 2.62
 (define (union-set set1 set2)
