@@ -115,4 +115,20 @@
 ;; list->tree to convert a list of n elements? 
 ;; Order of logn?
 
+;; exercise 2.65 - implement union & intersection
+(define (union-set set1 set2)
+  (define (add-list-to-tree tree list)
+    (if (null? list) 
+	tree
+	(add-list-to-tree (adjoin-set (car list) tree) (cdr list))
+	))
+  (add-list-to-tree set1 (tree->list-2 set2)))
+
+(define (intersection-set set1 set2)
+  (define (helper old-tree items new-tree)
+    (cond ((null? items) new-tree) 
+	  ((element-of-set? (car items) old-tree)
+	   (helper old-tree (cdr items) (adjoin-set (car items) new-tree)))
+	  (else (helper old-tree (cdr items) new-tree))))
+  (helper set1 (tree->list-2 set2) '()))
 
