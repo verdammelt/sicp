@@ -132,3 +132,9 @@
 	  (else (helper old-tree (cdr items) new-tree))))
   (helper set1 (tree->list-2 set2) '()))
 
+
+;;;
+;;; Well... looking at Bill the Lizard's answers I think I would get
+;;; pretty low marks on this assignment.
+;;; not going to redo it however.
+;;;
