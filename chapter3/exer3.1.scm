@@ -32,5 +32,48 @@
 	(error "Incorrect password")))
   dispatch)
 
+;; exercise 3.4
+;; add to the previous exercise - call the cops if a wrong password 
+;; was used more than 7 times in a row
+(define (make-password-checker password)
+  (let ((num-failed-attempts 0))
+    (define (call-the-cops)
+      (error "Please stay where you are - the police have been dispatched to your location."))
+    
+    (define (failed-password)
+      (if (< num-failed-attempts 7)
+	  (begin (set! num-failed-attempts (1+ num-failed-attempts))
+		 (error "Incorrect password"))
+	  (call-the-cops)))
+    
+    (define (with-password-check attempted-password on-success)
+      (if (eq? attempted-password password)
+	  (begin 
+	    (set! num-failed-attempts 0)
+	    (on-success))
+	  (failed-password)))
+    with-password-check))
 
+(define (make-account balance password)
+  (define (withdraw amount)
+    (if (>= balance amount)
+	(begin (set! balance (- balance amount))
+	       balance)
+	"Insufficient funds"))
+
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+
+  (define password-checker (make-password-checker password))
+
+  (define (dispatch attempted-password m)
+    (password-checker attempted-password 
+		      (lambda ()
+			(cond ((eq? m 'withdraw) withdraw)
+			      ((eq? m 'deposit) deposit)
+			      (else (error "Unknown request -- MAKE-ACCOUNT"
+					   m))))))
+  
+  dispatch)
 
