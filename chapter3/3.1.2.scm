@@ -27,3 +27,17 @@
 	       (lambda () (p (random-in-range x1 x2) 
 			     (random-in-range y1 y2)))))
 
+;; exercise 3.6
+
+(let ((random-state 17.0))
+  (define (rand arg)
+    (define (new-random x)
+      (let ((a 13.0) (b 23.0) (m 31.0))
+	(modulo (+ (* a x) b) m)))
+    
+    (cond ((eq? arg 'generate)
+	   (begin (set! random-state (new-random random-state))
+		  random-state))
+	  ((eq? arg 'reset) (lambda (n) (set! random-state n)))
+	  (else (error "unknown argument")))))
+
