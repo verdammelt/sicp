@@ -28,3 +28,13 @@
 (define (make-joint account password new-password)
   (let ((passwordless-account (account password 'get-internal-account)))
     (make-password-account passwordless-account new-password)))
+
+;; exercise 3.8
+;; define (f n) such that:
+;;  (+ (f 0) (f 1)) => 0 if + evaluates left-to-right and 
+;;  (+ (f 0) (f 1)) => 1 if + evaluates right-to-left
+(define f
+  (let ((state 1))
+    (lambda (n)
+      (set! state (* state n))
+      state)))
