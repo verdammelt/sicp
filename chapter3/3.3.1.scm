@@ -43,3 +43,13 @@
 		  (helper (cdr x)))))
     (helper x)))
 
+;; exercise 3.19 
+;; this is mean because it destroys the list - but i think it fulfills 
+;; the requirement.
+(define (has-cycle?-const x)
+  (cond ((not (pair? x)) 'NO-CYCLE-HERE)
+	((eq? (car x) '*SEKRIT*) 'OMG-CYCLE)
+	(else (set-car! x '*SEKRIT*)
+	      (has-cycle?-const x))))
+
+
