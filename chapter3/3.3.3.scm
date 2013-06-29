@@ -66,3 +66,6 @@
 
 ;; exercise 3.26
 ;; (skipping)
+
+;; exercise 3.27
+;; (skipping)
