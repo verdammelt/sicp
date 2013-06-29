@@ -24,6 +24,7 @@
 	(else 0)))
 
 ;; the wire primitives
+(define (make-wire))
 (define (get-signal w))
 (define (set-signal! w new))
 (define (add-action! w proc))
@@ -122,3 +123,5 @@
 		 (set! lcout (append lcout w)))))
     (set! lcout (append lcout c))
     (ripple-build list-a list-b list-s lcin lcout)))
+
+
