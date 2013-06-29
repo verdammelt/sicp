@@ -64,3 +64,5 @@
 (display ((nt 'lookup) '(x y))) (newline)
 (display ((nt 'lookup) (list 'x 'y))) (newline)
 
+;; exercise 3.26
+;; (skipping)
