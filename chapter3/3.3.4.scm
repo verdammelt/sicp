@@ -24,31 +24,85 @@
 	(else 0)))
 
 ;; the wire primitives
-(define (make-wire))
-(define (get-signal w))
-(define (set-signal! w new))
-(define (add-action! w proc))
+(define (make-wire)
+  (define (call-each procedures)
+    (if (null? procedures)
+	'done
+	(begin ((car procedures)
+		(call-each (cdr procedures))))))
+
+  (let ((signal-value 0) (action-procedures '()))
+    (define (set-my-signal! new-value)
+      (if (not (= signal-value new-value))
+	  (begin (set! signal-value new-value)
+		 (call-each action-procedures))
+	  'done))
+    (define (accept-action-procedure! proc)
+      (set! action-procedures (cons proc action-procedures))
+      (proc))
+    (define (dispatch m)
+      (cond ((eq? m 'get-signal) signal-value)
+	    ((eq? m 'set-signal!) set-my-signal)
+	    ((eq? m 'add-action!) accept-action-procedure!)
+	    (else (error "Unknown operation -- WIRE" m))))
+    dispatch))
+
+(define (get-signal w)
+  (w 'get-signal))
+(define (set-signal! w new)
+  ((w 'set-signal!) new))
+(define (add-action! w proc)
+  ((w 'add-action!) proc))
 
 ;; the agenda primitives
-(define (after-delay delay proc))
+(define (make-agenda))
+(define (empty-agenda? a))
+(define (first-agenda-item ))
+(define (remove-first-agenda-item! a))
+(define (add-to-agenda! time action a))
+(define (current-time a))
+
+(define *the-agenda* (make-agenda))
+(define (after-delay delay proc)
+  (add-to-agenda! (+ delay (current-time *the-agenda*))
+		  proc
+		  *the-agenda*))
+
+(define (propagate)
+  (if (empty-agenda? *the-agenda*)
+      'done
+      (let ((first-item (first-agenda-item *the-agenda*)))
+	(first-item)
+	(remove-first-agenda-item! *the-agenda*)
+	(propagate))))
+
+(define (probe name wire)
+  (add-action! wire
+	       (lambda ()
+		 (newline)
+		 (display name)
+		 (display " ")
+		 (display (current-time *the-agenda*))
+		 (display " New-value = ")
+		 (display (get-signal wire)))))
 
 ;; the circuits
-(define inverter-delay 0)
+(define *inverter-delay* 2)
 (define (inverter input output)
   (define (invert-input)
     (let ((new-value (logical-not (get-signal input))))
-      (after-delay inverter-delay
+      (after-delay *inverter-delay*
 		   (lambda () (set-signal! output new-value)))))
   (add-action! input invert-input)
   'ok)
 
-(define and-gate-delay 0)
+(define *and-gate-delay* 3)
 (define (and-gate a1 a2 output)
   (define (and-gate-procedure)
     (let ((new-value
 	   (logical-and (get-signal s1)
 			(get-signal s2))))
-      (after-delay and-gate-delay
+      (after-delay *and-gate-delay*
 		   (lambda ()
 		     (set-signal! output new-value)))))
   (add-action! a1 and-gate-procedure)
@@ -56,13 +110,13 @@
   'ok)
 
 ;; exercise 3.28 - define an or-gate
-(define or-gate-delay 0)
+(define *or-gate-delay* 5)
 (define (or-gate a1 a2 output)
   (define (or-gate-procedure)
     (let ((new-value
 	   (logical-or (get-signal s1)
 		       (get-signal s2))))
-      (after-delay or-gate-delay
+      (after-delay *or-gate-delay*
 		   (lambda () (set-signal! output new-value)))))
   (add-action! a1 or-gate-procedure)
   (add-action! a2 or-gate-procedure)
@@ -123,5 +177,11 @@
 		 (set! lcout (append lcout w)))))
     (set! lcout (append lcout c))
     (ripple-build list-a list-b list-s lcin lcout)))
+
+
+;; exercise 3.31
+;; you need the extra call to intialize the listeners of the current
+;; value. and also to ensure that the resulting actions are added to
+;; the agenda
 
 
