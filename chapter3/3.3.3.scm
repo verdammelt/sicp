@@ -1,11 +1,11 @@
 ;; exercise 3.24 - change the table implementation to use a
 ;; user-supplied equality predicate instead of relying upon assoc's
 ;; use of equal?
-(define (make-table)
+(define (make-table same-key?)
   (let ((local-table (list '*table*)))
     (define (assoc key records)
       (cond ((null? records) false)
-	    ((equal? key (caar records)) (car records))
+	    ((same-key? key (caar records)) (car records))
 	    (else (assoc key (cdr records)))))
     (define (print) (display local-table))
     (define (lookup key)
@@ -24,7 +24,7 @@
 	    (else (error "Unknown operation -- table " m))))
     dispatch))
 
-(define t (make-table))
+(define t (make-table equal?))
 ((t 'insert!) 'a 1)
 ((t 'insert!) 'b 2)
 ((t 'insert!) 'c 3)
@@ -33,4 +33,14 @@
 (display "lookup b:\n")
 (write-line ((t 'lookup) 'b))
 
+(define (fuzzy-equal? a b)
+  (< (abs (- a b)) 2))
+(define fuzzt (make-table fuzzy-equal?))
+((fuzzt 'insert!) 1 'a)
+((fuzzt 'insert!) 5 'b)
+((fuzzt 'insert!) 9 'c)
+(newline)
+(write-line ((fuzzt 'print)))
+(display "lookup 2:\n")
+(write-line ((fuzzt 'lookup) 2))
 
