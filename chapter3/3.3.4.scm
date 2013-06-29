@@ -84,7 +84,40 @@
 ;; (+ and-gate-delay (* 3 inverter-delay))
 ;;    - if a1 & a2 are signaled at different times
 
+(define (half-adder a b s c)
+  (let ((d (make-wire)) 
+	(e (make-wire)))
+    (or-gate a b d)
+    (and-gate a b c)
+    (inverter c e)
+    (and-gate d e s)
+    'ok))
+(define (full-adder (a b c-in sum c-out))
+  (let ((s (make-wire))
+	(c1 (make-wire))
+	(c2 (make-wire)))
+    (half-adder b c-in s c1)
+    (half-adder a s sum c2)
+    (or-gate c1 c2 c-out)
+    'ok))
 
-
-
-
+;; exercise 3.30 -- ripple-carry adder
+;; A1..An, B1..Bn add together to make S1..Sn with the final  C
+;; take 4 arguments: 3 lists of n wires each (A, B, S) and also a C
+;; (the initial c-in on the first full-adder is 0)
+(define (ripple-carry-adder list-a list-b list-s c)
+  (define (ripple-carry-adder-helper list-a list-b list-s c-in c-out)
+    (if (null? list-a) 'ok
+	(full-adder (car list-a)
+		    (car list-b)
+		    c-in
+		    (car list-s)
+		    c-out)
+	(ripple-carry-adder-helper (cdr list-a)
+				   (cdr list-b)
+				   (cdr list-s)
+				   c-out
+				   (make-wire))))
+  (let ((c-init (make-wire)))
+    (ripple-carry-adder-helper list-a list-b list-s c-init c)
+    (set-signal c-init 0)))
