@@ -61,3 +61,26 @@
 
 
 ;; exercise 3.36 (skipping - i hate environment diagrams)
+
+;; exercise 3.37
+;; define syntatic sugar around primitive constraints so that the 
+;; temperature converter can look like this:
+(load "primitive-constraints-sugar")
+(define (c-to-f x)
+  (c+ (c* (c/ (cv 9) (cv 5))
+	  x)
+      (cv 32)))
+
+(define C1 (make-connector))
+(define F1 (c-to-f C1))
+(probe 'F1 F1)
+(probe 'C1 C1)
+(set-value! C1 100 'user)
+
+(define C2 (make-connector))
+(define F2 (c-to-f C2))
+(probe 'F2 F2)
+(probe 'C2 C2)
+(set-value! F2 32 'user)
+
+
