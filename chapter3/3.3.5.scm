@@ -60,5 +60,4 @@
   me)
 
 
-
-
+;; exercise 3.36 (skipping - i hate environment diagrams)
