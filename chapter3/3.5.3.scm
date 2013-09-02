@@ -176,3 +176,21 @@
 				     (+ (* 2 i) (* 3 j) (* 5 i j)))))))
 
 
+;; exercise 3.71 
+(define (cube-sum p)
+  (let ((i (car p))
+	(j (cadr p)))
+    (+ (* i i i) (* j j j))))
+
+(define ram-nums
+  (let ((pairs (weighted-pairs integers integers cube-sum)))
+    (stream-map 
+     (lambda (x) (list (cube-sum (car x)) x))
+     (stream-filter 
+      (lambda (poss) 
+	(let ((x (car poss))
+	      (y (cadr poss)))
+	  (= (cube-sum x) (cube-sum y))))
+      (stream-map 
+       (lambda (x y) (list x y)) 
+       pairs (stream-cdr pairs))))))
