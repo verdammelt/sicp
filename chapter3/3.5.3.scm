@@ -194,3 +194,21 @@
       (stream-map 
        (lambda (x y) (list x y)) 
        pairs (stream-cdr pairs))))))
+
+;; exercise 3.72
+;; numbers which can be made by sum of two squares in 3 ways
+(define (square-sum p) (+ (square (car p)) (square (cadr p))))
+(define sum-of-squares-three-way
+  (let ((pairs (weighted-pairs integers integers square-sum)))
+    (stream-map
+     (lambda (x) (list (square-sum (car x)) x))
+     (stream-filter
+      (lambda (poss)
+	(let ((x (car poss))
+	      (y (cadr poss))
+	      (z (caddr poss)))
+	  (= (square-sum x) (square-sum y) (square-sum z))))
+      (stream-map
+       (lambda (x y z) (list x y z))
+       pairs (stream-cdr pairs) (stream-cdr (stream-cdr pairs)))))))
+
