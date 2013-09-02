@@ -1,5 +1,6 @@
 (define (add-streams s1 s2)
   (stream-map + s1 s2))
+
 (define (scale-stream stream factor)
   (stream-map (lambda (x) (* x factor)) stream))
 
@@ -82,10 +83,22 @@
 ;; d(sine) = cosine
 ;; d(cosine) = -sine
 (define cosine-series
-  (cons-stream 1 (integrate-series (scale-stream -1 sine-series)))
+  (cons-stream 1 (integrate-series (scale-stream sine-series -1))))
 
 (define sine-series
   (cons-stream 0 (integrate-series cosine-series)))
 
+;; exer 3.60
+(define (mul-series s1 s2)
+  (cons-stream 
+   (* (stream-car s1) (stream-car s2))
+   (add-streams 
+    (scale-stream (stream-cdr s2) (stream-car s1))
+    (mul-series (stream-cdr s1) s2))))
+
+(define sine-x-squared-plus-cosine-x-squared
+  (add-streams
+   (mul-series sine-series sine-series)
+   (mul-series cosine-series cosine-series)))
 
 
