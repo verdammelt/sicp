@@ -114,4 +114,8 @@
 			    (invert-unit-series S))
 		-1)))
 
+;; exercise 3.62
+;; skipping due to math :(
+
+
 
