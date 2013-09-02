@@ -19,3 +19,10 @@
 (define factorials (cons-stream 1 (mul-streams
 				   (add-streams ones integers)
 				   factorials)))
+
+;; exercise 3.55
+(define (partial-sums stream)
+  (define partial-sum-stream 
+    (cons-stream (stream-car stream)
+		 (add-streams partial-sum-stream (stream-cdr stream))))
+  partial-sum-stream)
