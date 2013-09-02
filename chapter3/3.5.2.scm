@@ -26,3 +26,25 @@
     (cons-stream (stream-car stream)
 		 (add-streams partial-sum-stream (stream-cdr stream))))
   partial-sum-stream)
+
+;; exercise 3.56
+;; Hamming enumeration:
+;; stream of all positive integers with 2, 3, 5 as only prime factors
+(define (merge s1 s2)
+  (cond ((stream-null? s1) s2)
+	((stream-null? s2) s1)
+	(else
+	 (let ((s1car (stream-car s1))
+	       (s2car (stream-car s2)))
+	   (cond ((< s1car s2car)
+		  (cons-stream s1car (merge (stream-cdr s1) s2)))
+		 ((> s1car s2car)
+		  (cons-stream s2car (merge s1 (stream-cdr s2))))
+		 (else
+		  (cons-stream s1car
+			       (merge (stream-cdr s1)
+				      (stream-cdr s2)))))))))
+
+(define hamming (cons-stream 1 (merge (scale-stream hamming 2)
+				      (merge (scale-stream hamming 3)
+					     (scale-stream hamming 5)))))
