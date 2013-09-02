@@ -130,18 +130,16 @@
 ;; extend pairs to instead of interleaving - use some sort or merge 
 ;; operation
 (define (weighted-merge weight-fn s1 s2)
-  (cond ((stream-null? s1) s2)
-	((stream-null? s2) s1)
-	(else
-	 (let ((s1car (stream-car s1))
-	       (s2car (stream-car s2)))
-	   (let ((diff (- (weight-fn s1car)
-			  (weight-fn s2car))))
-	     (cond ((<= diff 0)
-		    (cons-stream s1car (weighted-merge weight-fn (stream-cdr s1) s2)))
-		   ((> diff 0)
-		    (cons-stream s2car (weighted-merge weight-fn s1 (stream-cdr s2))))
-		   ))))))
+  (let ((merge (lambda (s1 s2)
+		 (weighted-merge weight-fn s1 s2))))
+    (cond ((stream-null? s1) s2)
+	  ((stream-null? s2) s1)
+	  (else
+	   (let ((diff (- (weight-fn (stream-car s1))
+			  (weight-fn (stream-car s2)))))
+	     (if (<= diff 0)
+		 (cons-stream (stream-car s1) (merge (stream-cdr s1) s2))
+		 (cons-stream (stream-car s2) (merge s1 (stream-cdr s2)))))))))
 
 (define (weighted-pairs s t weight-fn)
   (cons-stream
