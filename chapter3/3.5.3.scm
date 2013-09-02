@@ -137,14 +137,11 @@
 	       (s2car (stream-car s2)))
 	   (let ((diff (- (weight-fn s1car)
 			  (weight-fn s2car))))
-	     (cond ((< diff 0)
+	     (cond ((<= diff 0)
 		    (cons-stream s1car (weighted-merge weight-fn (stream-cdr s1) s2)))
 		   ((> diff 0)
 		    (cons-stream s2car (weighted-merge weight-fn s1 (stream-cdr s2))))
-		   (else
-		    (cons-stream s1car
-				 (weighted-merge weight-fn (stream-cdr s1)
-						 (stream-cdr s2))))))))))
+		   ))))))
 
 (define (weighted-pairs s t weight-fn)
   (cons-stream
