@@ -67,3 +67,25 @@
 
 ;; mjs: i was right!
 
+;; exercise 3.59a
+;; integral of a0+a1x+a2x^2... is
+;; c+ a0x + (a1/2)x + (a2/3)x^...
+(define (div-stream s1 s2)
+  (stream-map / s1 s2))
+(define (integrate-series coeff-stream)
+  (div-stream coeff-stream integers))
+
+;; exercise 3.59b
+;; e^x is its own derivative so we can define:
+(define exp-series (cons-stream 1 (integrate-stream exp-series)))
+;; do the same for sine & cosine given that:
+;; d(sine) = cosine
+;; d(cosine) = -sine
+(define cosine-series
+  (cons-stream 1 (integrate-series (scale-stream -1 sine-series)))
+
+(define sine-series
+  (cons-stream 0 (integrate-series cosine-series)))
+
+
+
