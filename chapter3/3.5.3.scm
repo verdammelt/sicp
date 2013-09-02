@@ -27,4 +27,19 @@
 ;; Thus even with memoization much more computation needs to be done
 ;; because each promise from each stream needs to be forced.
 
+;; exer 3.64
+;; write stream-limit which cdrs down a stream until it finds two 
+;; elements which are different by less than a tolerance - returns
+;; the second of those elements
+;; mjs: had mine return the index and the element.
+(define (stream-limit stream tolerance)
+  (define (stream-limit-iter n)
+    (let ((this-one (stream-ref stream n))
+	  (next-one (stream-ref stream (1+ n))))
+      (if (< (abs (- this-one next-one)) tolerance)
+	  (cons (1+ n) next-one)
+	  (stream-limit-iter (1+ n)))))
+  (stream-limit-iter 0))
+
+
 
