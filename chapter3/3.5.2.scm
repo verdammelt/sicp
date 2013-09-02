@@ -101,4 +101,17 @@
    (mul-series sine-series sine-series)
    (mul-series cosine-series cosine-series)))
 
+;; exer 3.61
+;; for a power series S with constant term 1 find X = 1/S
+;; define S = 1 + Sr
+;; (Sr is S after the constant)
+;; X = 1 - Sr(X)
+
+(define (invert-unit-series S)
+  (cons-stream 1
+	       (scale-stream
+		(mul-series (stream-cdr S)
+			    (invert-unit-series S))
+		-1)))
+
 
