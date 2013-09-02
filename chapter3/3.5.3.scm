@@ -126,3 +126,58 @@
 			(square k))))
 		 (triples integers integers integers)))
 
+;; exercise 3.70
+;; extend pairs to instead of interleaving - use some sort or merge 
+;; operation
+(define (weighted-merge weight-fn s1 s2)
+  (cond ((stream-null? s1) s2)
+	((stream-null? s2) s1)
+	(else
+	 (let ((s1car (stream-car s1))
+	       (s2car (stream-car s2)))
+	   (let ((diff (- (weight-fn s1car)
+			  (weight-fn s2car))))
+	     (cond ((< diff 0)
+		    (cons-stream s1car (weighted-merge weight-fn (stream-cdr s1) s2)))
+		   ((> diff 0)
+		    (cons-stream s2car (weighted-merge weight-fn s1 (stream-cdr s2))))
+		   (else
+		    (cons-stream s1car
+				 (weighted-merge weight-fn (stream-cdr s1)
+						 (stream-cdr s2))))))))))
+
+(define (weighted-pairs s t weight-fn)
+  (cons-stream
+   (list (stream-car s) (stream-car t))
+   (weighted-merge weight-fn
+		   (stream-map (lambda (x) (list (stream-car s) x))
+			       (stream-cdr t))
+		   (weighted-pairs (stream-cdr s) (stream-cdr t) weight-fn))))
+
+;; part a. all pairs (i, j) compared by i+j
+(define pairs-sorted
+  (weighted-pairs integers integers (lambda (x) (+ (car x) (cadr x)))))
+
+;; part b. all pairs (i, j) with i<=j where neither i nor j are 
+;; divisible by 2, 3, 5 and pairs are ordered according to 2i+3j+5ij
+(define (divisible? x y)
+  (= (remainder x y) 0))
+(define (divisible-by-any? x ys)
+  (cond ((null? ys) false)
+	((divisible? x (car ys)) true)
+	(else (divisible-by-any? x (cdr ys)))))
+
+(define weird-thing
+  (stream-filter (lambda (x)
+		   (let ((i (car x))
+			 (j (cadr x))
+			 (verboten (list 2 3 5)))
+		     (and (not (divisible-by-any? i verboten))
+			  (not (divisible-by-any? j verboten)))))
+		 (weighted-pairs integers integers
+				 (lambda (x)
+				   (let ((i (car x))
+					 (j (cadr x)))
+				     (+ (* 2 i) (* 3 j) (* 5 i j)))))))
+
+
