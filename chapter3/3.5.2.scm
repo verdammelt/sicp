@@ -47,3 +47,20 @@
 (define hamming (cons-stream 1 (merge (scale-stream hamming 2)
 				      (merge (scale-stream hamming 3)
 					     (scale-stream hamming 5)))))
+
+;; exercise 3.57
+;; skipping - but quickly: without memoization we'd calculate each fib
+;; number over and over again as we needed it for each fib(n-1) and
+;; fib(n-2) to compute fib(n)
+
+;; exercise 3.58
+;; what does this do
+(define (expand num den radix)
+  (cons-stream
+   (quotient (* num radix) den)
+   (expand (remainder (* num radix) den) den radix)))
+;; specifically for (expand 1 7 10) and (expand 3 8 10)
+
+;; mjs: I think that this will create a stream which when takin
+;; together are the digits of num/den
+;; so (expand 3 8 10) would be 3, 7, 5, 0, 0 ....
