@@ -22,10 +22,9 @@
 
 ;; exercise 3.55
 (define (partial-sums stream)
-  (define partial-sum-stream 
-    (cons-stream (stream-car stream)
-		 (add-streams partial-sum-stream (stream-cdr stream))))
-  partial-sum-stream)
+  (cons-stream (stream-car stream)
+	       (add-streams (stream-cdr stream)
+			    (partial-sums stream))))
 
 ;; exercise 3.56
 ;; Hamming enumeration:
