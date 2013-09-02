@@ -64,3 +64,6 @@
 ;; mjs: I think that this will create a stream which when takin
 ;; together are the digits of num/den
 ;; so (expand 3 8 10) would be 3, 7, 5, 0, 0 ....
+
+;; mjs: i was right!
+
