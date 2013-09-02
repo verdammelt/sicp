@@ -11,6 +11,20 @@
 					   guesses)))
   guesses)
 
+(define (euler-transform s)
+  (let ((s0 (stream-ref s 0))
+	(s1 (stream-ref s 1))
+	(s2 (stream-ref s 2)))
+    (cons-stream (- s2 (/ (square (- s2 s1))
+			  (+ s0 (* -2 s1) s2)))
+		 (euler-transform (stream-cdr s)))))
+
+(define (make-tableau transform s)
+  (cons-stream s (make-tableau transform (transform s))))
+
+(define (accelerated-sequence transform s)
+  (stream-map stream-car (make-tableau transform s)))
+
 ;; exercise 3.61
 ;; Louis P. Reasoner wonders why we couldn't define sqrt-stream like this:
 (define (sqrt-stream-2 x)
@@ -39,6 +53,22 @@
        tolerance)
       (stream-cadr stream)
       (stream-limit (stream-cdr stream) tolerance)))
+
+;; exer 3.65
+;; approximate ln(2) as pi was approximated in the book
+;; the series is 1 - 1/2 + 1/3 - 1/4...
+(define (ln-2-summands n)
+  (cons-stream (/ 1.0 n)
+	       (stream-map - (ln-2-summands (1+ n)))))
+(define ln-2-stream
+  (partial-sums (ln-2-summands 1)))
+
+;; tried (stream-limit ln-2-stream 0.0001) and it effectively hung
+;; used (stream-head <stream> 10) to get an idea of the first 10 item
+;; of each on of the streams. ln-2-stream barely converged - 
+;; euler-transform of it did well but the accelerated-sequence of it
+;; was pretty amazing.
+
 
 
 
