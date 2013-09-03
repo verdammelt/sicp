@@ -228,3 +228,8 @@
      (scale-stream i r)
      (scale-stream (integral i v0 dt) (/ 1 c)))))
 
+;; exercise 3.74
+;; mjs: since i did this style above i thought this one was prety easy.
+;; (define zero-crossings
+;;   (stream-map sign-change-detector sense-data (stream cdr sense-data)))
+;; mjs: commented out so file could load.
