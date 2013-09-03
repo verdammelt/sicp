@@ -212,3 +212,19 @@
        (lambda (x y z) (list x y z))
        pairs (stream-cdr pairs) (stream-cdr (stream-cdr pairs)))))))
 
+;; streams as signals
+(define (scale-stream s f) (stream-map (lambda (x) (* x f)) s))
+(define (integral integrand initial-value dt)
+  (define int
+    (cons-stream initial-value
+		 (add-streams (scale-stream integrand dt)
+			      int)))
+  int)
+
+;; exercise 3.73
+(define (RC r c dt)
+  (lambda (i v0)
+    (add-streams
+     (scale-stream i r)
+     (scale-stream (integral i v0 dt) (/ 1 c)))))
+
