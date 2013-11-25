@@ -233,3 +233,6 @@
 ;; (define zero-crossings
 ;;   (stream-map sign-change-detector sense-data (stream cdr sense-data)))
 ;; mjs: commented out so file could load.
+
+;; exercise 3.75 & 3.76 skipped due to apathy.
+
