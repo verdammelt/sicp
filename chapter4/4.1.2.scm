@@ -169,3 +169,43 @@
 			 (sequence->exp (cond-actions first))
 			 (expand-clauses rest)))))))
 
+;; to test this with '(cond ((assoc 'b '((a 1) (b 2))) => cadr) (else false))
+;; add assoc and cadr to the primitive-procedures and get a new environment
+;; (set! primitive-procedures (cons (list 'assoc assoc) primitive-procedures))
+;; (set! primitive-procedures (cons (list 'cadr cadr) primitive-procedures))
+;; (define my-env (setup-environment))
+
+;; exercise 4.6
+;; implemnet let as nested lambdas
+(define (let? exp) (tagged-list? exp 'let))
+(define (let-variables exp)
+  (map car (cadr exp)))
+(define (let-values exp)
+  (map cadr (cadr exp)))
+(define (let-body exp) (cddr exp))
+(define (let->combination exp)
+  (cons (make-lambda (let-variables exp)
+		     (let-body exp))
+	(let-values exp)))
+
+(define (eval-with-let exp env)
+  (cond ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        ((quoted? exp) (text-of-quotation exp))
+        ((assignment? exp) (eval-assignment exp env))
+        ((definition? exp) (eval-definition exp env))
+        ((if? exp) (eval-if exp env))
+        ((lambda? exp)
+         (make-procedure (lambda-parameters exp)
+                         (lambda-body exp)
+                         env))
+        ((begin? exp) 
+         (eval-sequence (begin-actions exp) env))
+        ((cond? exp) (eval (cond->if exp) env))
+	((let? exp) (eval (let->combination exp) env))
+        ((application? exp)
+         (apply (eval (operator exp) env)
+                (list-of-values (operands exp) env)))
+        (else
+         (error "Unknown expression type -- EVAL" exp))))
+
