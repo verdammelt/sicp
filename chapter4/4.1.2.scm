@@ -178,10 +178,11 @@
 ;; exercise 4.6
 ;; implemnet let as nested lambdas
 (define (let? exp) (tagged-list? exp 'let))
+(define (let-bindings exp) (cadr exp))
 (define (let-variables exp)
-  (map car (cadr exp)))
+  (map car (let-bindings exp)))
 (define (let-values exp)
-  (map cadr (cadr exp)))
+  (map cadr (let-bindings exp)))
 (define (let-body exp) (cddr exp))
 (define (let->combination exp)
   (cons (make-lambda (let-variables exp)
@@ -201,11 +202,64 @@
                          env))
         ((begin? exp) 
          (eval-sequence (begin-actions exp) env))
-        ((cond? exp) (eval (cond->if exp) env))
-	((let? exp) (eval (let->combination exp) env))
+        ((cond? exp) (eval-with-let (cond->if exp) env))
+	((let? exp) (eval-with-let (let->combination exp) env))
         ((application? exp)
-         (apply (eval (operator exp) env)
+         (apply (eval-with-let (operator exp) env)
                 (list-of-values (operands exp) env)))
         (else
          (error "Unknown expression type -- EVAL" exp))))
+
+;; exercise 4.7
+;; implement let*
+
+;; let* can be implmented as a set of nested lets because each binding
+;; depends upon the previous bindings just like a set of nested lets
+;; (boy that's a lame explanation)
+
+;; (let* ((x 1) (y (cons x x))) (cons x y)) =>
+;; (let ((x 1)) (let ((y (cons x x))) (cons x y)))
+
+(define (let*? exp) (tagged-list? exp 'let*))
+(define (make-let bindings body)
+  (list 'let bindings body))
+(define (let*->nested-lets exp)
+  (pp exp)
+  (let ((bindings (let-bindings exp))
+	(body (car (let-body exp))))
+    (expand-let* bindings body)
+    ))
+(define (expand-let* bindings body)
+  (make-let (list (car bindings))
+	    (if (null? (cdr bindings)) body
+		(expand-let* (cdr bindings) body))))
+(define (eval-with-let* exp env)
+  (cond ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        ((quoted? exp) (text-of-quotation exp))
+        ((assignment? exp) (eval-assignment exp env))
+        ((definition? exp) (eval-definition exp env))
+        ((if? exp) (eval-if exp env))
+        ((lambda? exp)
+         (make-procedure (lambda-parameters exp)
+                         (lambda-body exp)
+                         env))
+        ((begin? exp) 
+         (eval-sequence (begin-actions exp) env))
+        ((cond? exp) (eval-with-let* (cond->if exp) env))
+	((let? exp) (eval-with-let* (let->combination exp) env))
+	((let*? exp) (eval-with-let* (let*->nested-lets exp) env))
+        ((application? exp)
+         (apply (eval-with-let* (operator exp) env)
+                (list-of-values (operands exp) env)))
+        (else
+         (error "Unknown expression type -- EVAL" exp))))
+
+;; needed because i don't want to change the /real/ eval
+;; (define (eval-sequence exps env)
+;;   (cond ((last-exp? exps) (eval-with-let* (first-exp exps) env))
+;;         (else (eval-with-let* (first-exp exps) env)
+;;               (eval-sequence (rest-exps exps) env))))
+
+
 
