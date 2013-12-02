@@ -127,3 +127,20 @@
 	((eval (first-operand exps) env) true)
 	(else (eval-or (rest-operands exps) env))))
 
+;; and now do them as derived expressions
+(define (eval-and exps env)
+  (eval (and->if exps) env))
+(define (and->if exps)
+  (if (null? exps) 
+      'true
+      (let ((first (car exps))
+	    (rest (cdr exps)))
+	(make-if first (and->if rest) 'false))))
+(define (eval-or exps env)
+  (eval (or->if exps) env))
+(define (or->if exps)
+  (if (null? exps)
+      'false
+      (let ((first (car exps))
+	    (rest (cdr exps)))
+	(make-if first 'true (or->if rest)))))
