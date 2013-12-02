@@ -144,3 +144,28 @@
       (let ((first (car exps))
 	    (rest (cdr exps)))
 	(make-if first 'true (or->if rest)))))
+
+;; exercise 4.5
+;; add the (cond (<test> => <recipient>)) syntax
+;; if <test> evaluates to true then <recipient> is evaluated and will be
+;; a function of one argument which is applied to the result of <test>
+(define (cond-recipient-clause? clause)
+  (eq? '=> (car (cond-actions clause))))
+(define (expand-clauses clauses)
+  (if (null? clauses)
+      'false                          ; no else clause
+      (let ((first (car clauses))
+            (rest (cdr clauses)))
+        (if (cond-else-clause? first)
+            (if (null? rest)
+                (sequence->exp (cond-actions first))
+                (error "ELSE clause isn't last -- COND->IF"
+                       clauses))
+	    (if (cond-recipient-clause? first)
+		(make-if (cond-predicate first)
+			 (list (cadr (cond-actions first)) (cond-predicate first))
+			 (expand-clauses rest))
+		(make-if (cond-predicate first)
+			 (sequence->exp (cond-actions first))
+			 (expand-clauses rest)))))))
+
