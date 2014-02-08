@@ -18,7 +18,7 @@
 ;; (until pred body) ==>
 ;; (if pred '() (begin body (until pred body)))
 
-(define (for? exp) (eq? (car exp) 'for))
+(define (for? exp) (tagged-list exp 'for))
 (define (for-var exp) (cadr exp))
 (define (for-list exp) (cadddr exp))
 (define (for-body exp) (car (cddddr exp)))
@@ -37,7 +37,7 @@
 						(for-body exp))))))))
 	  (list (car values)))))
 
-(define (while? exp) (eq? (car exp) 'while))
+(define (while? exp) (tagged-list? exp 'while))
 (define (while-pred exp) (cadr exp))
 (define (while-body exp) (caddr exp))
 (define (make-while pred body) (list 'while pred body))
