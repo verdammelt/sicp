@@ -37,6 +37,15 @@
 						(for-body exp))))))))
 	  (list (car values)))))
 
+(define (while? exp) (eq? (car exp) 'while))
+(define (while-pred exp) (cadr exp))
+(define (while-body exp) (caddr exp))
+(define (make-while pred body) (list 'while pred body))
+(define (while->combination exp)
+  (make-if (while-pred exp) 
+	   (make-begin (list (while-body exp) exp)) 
+	   '()))
+
 (define (eval exp env)
   (cond ((self-evaluating? exp) exp)
         ((variable? exp) (lookup-variable-value exp env))
@@ -52,6 +61,7 @@
          (eval-sequence (begin-actions exp) env))
         ((cond? exp) (eval (cond->if exp) env))
 	((for? exp) (eval (for->combination exp env) env))
+	((while? exp) (eval (while->combination exp) env))
         ((application? exp)
          (apply (eval (operator exp) env)
                 (list-of-values (operands exp) env)))
