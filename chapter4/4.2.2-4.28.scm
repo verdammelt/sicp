@@ -8,3 +8,9 @@
 (define function factorial)
 (function 5)
 
+;; better example found on the web:
+(define (g x) (+ x 1)) 
+(define (f g x) (g x)) 
+
+;; without actual-value forcing - g will be a thunk and you can't
+;; call a thunk like a function (in (g x)).
