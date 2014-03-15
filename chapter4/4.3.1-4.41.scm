@@ -1,0 +1,90 @@
+;; Write a plain-Scheme version of the multiple-dwellings logic puzzle
+;; solver.
+;; (define (multiple-dwelling)
+;;   (let ((baker (amb 1 2 3 4 5))
+;; 	(cooper (amb 1 2 3 4 5))
+;; 	(fletcher (amb 1 2 3 4 5))
+;; 	(miller (amb 1 2 3 4 5))
+;; 	(smith (amb 1 2 3 4 5)))
+;;     (require
+;;      (distinct? (list baker cooper fletcher miller smith)))
+;;     (require (not (= baker 5)))
+;;     (require (not (= cooper 1)))
+;;     (require (not (= fletcher 5)))
+;;     (require (not (= fletcher 1)))
+;;     (require (> miller cooper))
+;;     (require (not (= (abs (- smith fletcher)) 1)))
+;;     (require (not (= (abs (- fletcher cooper)) 1)))
+;;     (list (list 'baker baker)
+;; 	  (list 'cooper cooper)
+;; 	  (list 'fletcher fletcher)
+;; 	  (list 'miller miller)
+;; 	  (list 'smith smith))))
+
+(define (flatmap f lst) 
+  (if (null? lst) 
+      '()
+      (let ((result (f (car lst))) 
+	    (rest (flatmap f (cdr lst)))) 
+	(if (or (pair? result) (null? result)) 
+	    (append result rest) 
+	    (cons result rest))))) 
+
+(define (in-set x . s) (memq x s))
+(define (off-by-one a b) (= (abs (- a b)) 1))
+
+(define (multiple-dwelling)
+  (define (baker b)
+    (cond ((= b 5) '())
+	  (else (flatmap (lambda (c) (cooper b c)) '(1 2 3 4 5)))))
+  (define (cooper b c)
+    (cond ((in-set c b) '())
+	  ((= c 1) '())
+	  (else (flatmap (lambda (f) (fletcher b c f)) '(1 2 3 4 5)))))
+  (define (fletcher b c f)
+    (cond ((in-set f b c) '())
+	  ((or (= f 5) (= f 1)) '())
+	  ((off-by-one c f) '())
+	  (else (flatmap (lambda (m) (miller b c f m)) '(1 2 3 4 5)))))
+  (define (miller b c f m)
+    (cond ((in-set m b c f) '())
+	  ((<= m c) '())
+	  (else (flatmap (lambda (s) (smith b c f m s)) '(1 2 3 4 5)))))
+  (define (smith b c f m s)
+    (cond ((in-set s b c f m) '())
+	  ((off-by-one f s) '())
+	  (else (list b c f m s))))
+  (flatmap (lambda (b) (baker b)) '(1 2 3 4 5)))
+
+(define (multiple-dwelling-lambda)
+  (flatmap 
+   (lambda (baker)
+     (cond ((= baker 5) '())
+	   (else (flatmap 
+		  (lambda (cooper)
+		    (cond ((in-set cooper baker) '())
+			  ((= cooper 1) '())
+			  (else (flatmap
+				 (lambda (fletcher)
+				   (cond ((in-set fletcher baker cooper) '())
+					 ((in-set fletcher 1 5) '())
+					 ((off-by-one cooper fletcher) '())
+					 (else (flatmap 
+						(lambda (miller)
+						  (cond ((in-set miller baker cooper fletcher) '())
+							((<= miller cooper) '())
+							(else (flatmap
+							       (lambda (smith)
+								 (cond ((in-set smith baker cooper fletcher miller) '())
+								       ((off-by-one fletcher smith) '())
+								       (else (list baker 
+										   cooper 
+										   fletcher 
+										   miller 
+										   smith)))
+								 ) '(1 2 3 4 5))))
+						  ) '(1 2 3 4 5))))
+				   ) '(1 2 3 4 5))))
+		    ) '(1 2 3 4 5))))
+     )  '(1 2 3 4 5)))
+
