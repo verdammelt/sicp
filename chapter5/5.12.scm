@@ -96,7 +96,9 @@
       (define (add-stack-register reg-name)
 	(set! stack-registers
 	      (add-to-list-uniquely reg-name stack-registers)))
-      (define (get-entry-points) entry-point-registers)
+      (define (add-register-assigned-from reg-name assign-expr)
+	(set! registers-assigned-from
+	      (add-to-assoc-uniquely reg-name assign-expr registers-assigned-from)))
       (define (allocate-register name)
         (if (assoc name register-table)
             (error "Multiply defined register: " name)
@@ -137,6 +139,8 @@
 	      ((eq? message 'get-entry-point-registers) entry-point-registers)
 	      ((eq? message 'add-stack-register) add-stack-register)
 	      ((eq? message 'get-stack-registers) stack-registers)
+	      ((eq? message 'add-register-assigned-from) add-register-assigned-from)
+	      ((eq? message 'get-registers-assigned-from) registers-assigned-from)
               (else (error "Unknown request -- MACHINE" message))))
       dispatch)))
 
@@ -192,3 +196,19 @@
     (lambda ()
       (set-contents! reg (pop stack))    
       (advance-pc pc))))
+
+
+(define (make-assign inst machine labels operations pc)
+  (let* ((reg-name (assign-reg-name inst)) 
+	 (target (get-register machine reg-name))
+	 (value-exp (assign-value-exp inst)))
+    ((machine 'add-register-assigned-from) reg-name value-exp)
+    (let ((value-proc
+           (if (operation-exp? value-exp)
+               (make-operation-exp
+                value-exp machine labels operations)
+               (make-primitive-exp
+                (car value-exp) machine labels))))
+      (lambda ()                ; execution procedure for assign
+        (set-contents! target (value-proc))
+        (advance-pc pc)))))
