@@ -85,6 +85,10 @@
       (define (add-instruction inst)
 	(set! all-instructions 
 	      (add-to-assoc-uniquely (car inst) inst all-instructions)))
+      (define (add-entry-point-register reg-name)
+	(if (not (member reg-name entry-point-registers))
+	    (set! entry-point-registers (cons reg-name entry-point-registers))))
+      (define (get-entry-points) entry-point-registers)
       (define (allocate-register name)
         (if (assoc name register-table)
             (error "Multiply defined register: " name)
@@ -121,6 +125,8 @@
               ((eq? message 'operations) the-ops)
 	      ((eq? message 'add-instruction) add-instruction)
 	      ((eq? message 'get-all-instructions) all-instructions)
+	      ((eq? message 'add-entry-point-register) add-entry-point-register)
+	      ((eq? message 'get-entry-point-registers) entry-point-registers)
               (else (error "Unknown request -- MACHINE" message))))
       dispatch)))
 
@@ -143,3 +149,20 @@
          (make-perform inst machine labels ops pc))
         (else (error "Unknown instruction type -- ASSEMBLE"
                      inst))))
+
+
+(define (make-goto inst machine labels pc)
+  (let ((dest (goto-dest inst)))
+    (cond ((label-exp? dest)
+           (let ((insts
+                  (lookup-label labels
+                                (label-exp-label dest))))
+             (lambda () (set-contents! pc insts))))
+          ((register-exp? dest)
+           (let* ((reg-name (register-exp-reg dest)) 
+		  (reg (get-register machine reg-name)))
+	     ((machine 'add-entry-point-register) reg-name)
+             (lambda ()
+               (set-contents! pc (get-contents reg)))))
+          (else (error "Bad GOTO instruction -- ASSEMBLE"
+                       inst)))))
