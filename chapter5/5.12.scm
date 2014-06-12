@@ -64,6 +64,11 @@
 	(cons (list key (cons value current-values)) alist)
 	alist)))
 
+(define (add-to-list-uniquely item l)
+  (if (not (member item l))
+      (cons item l)
+      l))
+
 (define (make-new-machine)
   (let ((pc (make-register 'pc))
         (flag (make-register 'flag))
@@ -86,8 +91,11 @@
 	(set! all-instructions 
 	      (add-to-assoc-uniquely (car inst) inst all-instructions)))
       (define (add-entry-point-register reg-name)
-	(if (not (member reg-name entry-point-registers))
-	    (set! entry-point-registers (cons reg-name entry-point-registers))))
+	(set! entry-point-registers 
+	      (add-to-list-uniquely reg-name entry-point-registers)))
+      (define (add-stack-register reg-name)
+	(set! stack-registers
+	      (add-to-list-uniquely reg-name stack-registers)))
       (define (get-entry-points) entry-point-registers)
       (define (allocate-register name)
         (if (assoc name register-table)
@@ -127,6 +135,8 @@
 	      ((eq? message 'get-all-instructions) all-instructions)
 	      ((eq? message 'add-entry-point-register) add-entry-point-register)
 	      ((eq? message 'get-entry-point-registers) entry-point-registers)
+	      ((eq? message 'add-stack-register) add-stack-register)
+	      ((eq? message 'get-stack-registers) stack-registers)
               (else (error "Unknown request -- MACHINE" message))))
       dispatch)))
 
@@ -166,3 +176,19 @@
                (set-contents! pc (get-contents reg)))))
           (else (error "Bad GOTO instruction -- ASSEMBLE"
                        inst)))))
+
+(define (make-save inst machine stack pc)
+  (let* ((reg-name (stack-inst-reg-name inst)) 
+	 (reg (get-register machine reg-name)))
+    ((machine 'add-stack-register) reg-name)
+    (lambda ()
+      (push stack (get-contents reg))
+      (advance-pc pc))))
+
+(define (make-restore inst machine stack pc)
+  (let* ((reg-name (stack-inst-reg-name inst)) 
+	 (reg (get-register machine reg-name)))
+    ((machine 'add-stack-register) reg-name)
+    (lambda ()
+      (set-contents! reg (pop stack))    
+      (advance-pc pc))))
