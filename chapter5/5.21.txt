@@ -1,0 +1,6 @@
+See associated images:
+
+5.21-1.jpg - failed first attempt - got stuck.
+5.21-2.jpg - solved part a, then realized when looking at part b that I had
+    solved part b not part a, called it victory anyway.
+
